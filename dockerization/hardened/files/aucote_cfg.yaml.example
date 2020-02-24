@@ -66,16 +66,16 @@ kuduworker:
     queue:
         address: ipc:///tmp/scar-pipeline.ipc
 
-# This section contains configuration related to topdis service
-# topdis:
+# This section contains configuration related to feeder service
+# feeder:
 #   api:
 #     host: <str|ipaddress> - host of api
 #     port: <int> - port of api
-#     base: <str> - base address for topdis
+#     base: <str> - base address for feeder
 
-topdis:
+feeder:
     api:
-        host: topdis
+        host: feeder
         port: 1234
         base: /api/v1
 
