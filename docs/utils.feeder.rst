@@ -1,7 +1,7 @@
-utils.topdis module
+utils.feeder module
 ===================
 
-.. automodule:: utils.topdis
+.. automodule:: utils.feeder
     :members:
     :undoc-members:
     :show-inheritance:
