@@ -1,16 +1,24 @@
 version: "3"
 services:
   postgres:
+    hostname: postgres
     image: postgres
     volumes:
       - ./dockerization/tests/postgres/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+  feeder:
+    hostname: feeder
+    build:
+      context: .
+      dockerfile: dockerization/feeder/Dockerfile
+    ports:
+      - 1234:1234
+
   aucote:
     build:
       context: .
       dockerfile: dockerization/tests/Dockerfile
-      args:
-        destEnv: int
-    tty: true
     volumes:
       - ./:/src
     environment:
@@ -21,3 +29,4 @@ services:
     working_dir: /src
     depends_on:
       - postgres
+      - feeder
