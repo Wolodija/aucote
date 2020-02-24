@@ -20,7 +20,7 @@ Submodules
    utils.task
    utils.tftp
    utils.time
-   utils.topdis
+   utils.feeder
    utils.toucan_monitor
    utils.web_server
 

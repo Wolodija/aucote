@@ -44,8 +44,7 @@ logging:
 #    max_nodes_query: <int> - Maximum number of nodes which should be quered for ports
 
 storage:
-    #db: "dbname=aucote user=aucote password=aucote host=localhost port=5432"
-    db: "postgresql://aucote:aucote@postgres:5432/aucote"
+    db: "postgresql://aucote:aucote@postgres/aucote"
     max_nodes_query: 200
     fresh_start: True
 

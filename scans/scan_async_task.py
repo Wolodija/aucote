@@ -13,7 +13,7 @@ from croniter import croniter
 from netaddr import IPSet
 
 from aucote_cfg import cfg
-from database.serializer import Serializer
+#from database.serializer import Serializer
 from structs import ScanType, ScanStatus, ScanContext, Service, Scan, TaskManagerType
 from utils.time import parse_period
 
@@ -27,9 +27,9 @@ class ScanAsyncTask(object):
     PROTOCOL = None
     NAME = None
 
-    TOPDIS_MIN_TIME = 5
-    TOPDIS_MAX_TIME = 30
-    TOPDIS_RETRIES = 5
+    feeder_MIN_TIME = 5
+    feeder_MAX_TIME = 30
+    feeder_RETRIES = 5
 
     def __init__(self, aucote):
         self._current_scan = []
@@ -115,9 +115,9 @@ class ScanAsyncTask(object):
                 node.scan = self.scan
         else:
             nodes = {
-                'snmp': await self.topdis.get_snmp_nodes()
+                'snmp': await self.feeder.get_snmp_nodes()
             }
-            nodes['hosts'] = await self.topdis.get_all_nodes() - nodes['snmp']
+            nodes['hosts'] = await self.feeder.get_all_nodes() - nodes['snmp']
 
         if filter_out_storage:
             storage_nodes = set(self.storage.get_nodes(
@@ -322,15 +322,15 @@ class ScanAsyncTask(object):
             await cfg.toucan.async_push_config(data, overwrite=True, keep_history=False)
 
     @property
-    def topdis(self):
+    def feeder(self):
         """
-        Topdis API object
+        feeder API object
 
         Returns:
-            Topdis
+            feeder
 
         """
-        return self.aucote.topdis
+        return self.aucote.feeder
 
     async def stop(self):
         """
@@ -411,8 +411,8 @@ class ScanAsyncTask(object):
         if vuln.expiration_time is None:
             vuln.expiration_time = vuln.time + expiration_period
 
-        msg = Serializer.serialize_vulnerability(vuln)
-        self.aucote.kudu_queue.send_msg(msg)
+        # msg = Serializer.serialize_vulnerability(vuln)
+        # self.aucote.kudu_queue.send_msg(msg)
 
     def __str__(self):
         return self.__class__.__name__

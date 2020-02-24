@@ -22,7 +22,7 @@ class ScannerTest(AsyncTestCase):
                     'tools_cron': '* * * * *'
                 }
             },
-            'topdis': {
+            'feeder': {
                 'api': {
                     'host': '',
                     'port': ''
@@ -64,7 +64,7 @@ class ScannerTest(AsyncTestCase):
                     'physical': True,
                 }
             },
-            'topdis': {
+            'feeder': {
                 'fetch_os': False
             },
             'portdetection': {
@@ -163,7 +163,7 @@ class ScannerTest(AsyncTestCase):
         self.thread._get_nodes_for_scanning.assert_called_once_with(filter_out_storage=True, scan=None)
 
     @gen_test
-    async def test_periodical_scan_with_topdis_error(self):
+    async def test_periodical_scan_with_feeder_error(self):
         self.thread._get_nodes_for_scanning = MagicMock(side_effect=ConnectionError)
 
         await self.thread.run()
@@ -305,7 +305,7 @@ class ScannerTest(AsyncTestCase):
                     'physical': True,
                 }
             },
-            'topdis': {
+            'feeder': {
                 'fetch_os': False
             },
             'portdetection': {

@@ -697,7 +697,7 @@ class ScanStatus(Enum):
 
 class TopisOSDiscoveryType(Enum):
     """
-    Type of Topdis OS discovery
+    Type of feeder OS discovery
 
     """
     FINGERPRINT = "OSFINGERPRINT"

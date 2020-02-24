@@ -60,7 +60,7 @@ cp aucote_cfg.yaml.exmaple aucote_cfg.yaml
 ```
 
 Fulfill `aucote_cfg.yaml` - the most important fields are:
- - `topdis.api.host` and `topdis.api.port`, which define how to connect to Topdis 
+ - `feeder.api.host` and `feeder.api.port`, which define how to connect to feeder
  - `toucan.enable` - might be good to disable for local runs
  - `kuduworker.enable` - might be good to disable for local runs
  

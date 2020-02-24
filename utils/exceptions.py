@@ -53,9 +53,9 @@ class PortRangeUnsupported(NmapUnsupported):
     """
 
 
-class TopdisConnectionException(Exception):
+class FeederConnectionException(Exception):
     """
-    Raises if topdis connection error occurred
+    Raises if feeder connection error occurred
 
     """
 

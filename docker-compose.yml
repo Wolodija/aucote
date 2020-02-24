@@ -1,23 +1,36 @@
 version: "3"
+
 services:
   postgres:
     image: postgres
+    container_name: postgres
+    hostname: postgres
     volumes:
-      - ./dockerization/tests/postgres/migrations:/docker-entrypoint-initdb.d
+      - ./dockerization/hardened/postgres/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
   aucote:
+    container_name: aucote
+    hostname: aucote
     build:
       context: .
-      dockerfile: dockerization/tests/Dockerfile
-      args:
-        destEnv: int
-    tty: true
+      dockerfile: Dockerfile
     volumes:
       - ./:/src
     environment:
-      AUCOTE_TEST_POSTGRES: 'postgresql://test_aucote:test_aucote@postgres/test_aucote'
-      LD_LIBRARY_PATH: /usr/local/lib64
-    entrypoint:
-      - .ci/run_all.sh
+      LD_LIBRARY_PATH: /usr/local/lib
+    command: bash -c "python3 aucote.py --syncdb --cfg aucote_cfg.yaml.example"
     working_dir: /src
     depends_on:
       - postgres
+      - feeder
+  feeder:
+    container_name: feeder
+    hostname: feeder
+    build:
+      context: .
+      dockerfile: dockerization/feeder/Dockerfile
+    ports:
+      - 1234:1234
+    expose:
+      - 1234

@@ -32,7 +32,7 @@ nodes_scans
 
 columns:
  - rowid (int) - row identifier
- - node_id (int) - node identifier (topdis base)
+ - node_id (int) - node identifier (feeder base)
  - node_ip (string) - node ip address
  - scan_id (int) - scan identifier (scans.rowid)
  - time (int) - node detecting time
@@ -48,7 +48,7 @@ ports_scans
 
 columns:
  - rowid (int) - row identifier
- - node_id (int) - node identifier (topdis base)
+ - node_id (int) - node identifier (feeder base)
  - node_ip (string) - node ip address
  - scan_id (int) - scan identifier (scans.rowid)
  - port (int) - port number
@@ -69,7 +69,7 @@ columns:
  - exploit_id (int) - script identifier
  - exploit_app (int) - script app name
  - exploit_name (int) - script name
- - node_id (int) - node identifier (topdis base)
+ - node_id (int) - node identifier (feeder base)
  - node_ip (string) - node ip address
  - port_protocol (int) - port protocol
  - port_number (int) - port number
@@ -87,7 +87,7 @@ vulnerabilities
 columns:
  - rowid (int) - row identifier
  - scan_id (int) - scan identifier (scans.rowid)
- - node_id (int) - node identifier (topdis base)
+ - node_id (int) - node identifier (feeder base)
  - node_ip (string) - node ip address
  - port_protocol (int) - port protocol
  - port (int) - port number

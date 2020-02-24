@@ -28,13 +28,12 @@ from scans.udp_scanner import UDPScanner
 from structs import TaskManagerType
 from threads.storage_thread import StorageThread
 from threads.tftp_thread import TFTPThread
-from utils.async_task_manager import AsyncTaskManager, ThrottlingConsumer
-from utils.exceptions import NmapUnsupported, TopdisConnectionException
+from utils.async_task_manager import AsyncTaskManager
+from utils.exceptions import NmapUnsupported, FeederConnectionException
 from utils.storage import Storage
-from utils.kudu_queue import KuduQueue
-from utils.topdis import Topdis
+from utils.feeder import Feeder
 from utils.web_server import WebServer
-from database.serializer import Serializer
+#from database.serializer import Serializer
 from aucote_cfg import cfg, load as cfg_load
 from tornado.platform.asyncio import AsyncIOMainLoop
 import asyncio
@@ -89,6 +88,7 @@ async def main():
 
         """
         if cfg['kuduworker.enable']:
+            from utils.kudu_queue import KuduQueue
             return KuduQueue(cfg['kuduworker.queue.address'])
         return MagicMock()  # used for local testing
 
@@ -131,7 +131,7 @@ class Aucote(object):
         self._storage = Storage(conn_string=cfg['storage.db'], nodes_limit=cfg['storage.max_nodes_query'])
 
         self.ioloop = IOLoop.current()
-        self.topdis = Topdis(cfg['topdis.api.host'], cfg['topdis.api.port'], cfg['topdis.api.base'])
+        self.feeder = Feeder(cfg['feeder.api.host'], cfg['feeder.api.port'], cfg['feeder.api.base'])
 
         self.async_task_managers = {
             TaskManagerType.SCANNER: AsyncTaskManager.instance(name=TaskManagerType.SCANNER.value,
@@ -140,11 +140,6 @@ class Aucote(object):
                                                                parallel_tasks=cfg['service.scans.parallel_tasks']),
             TaskManagerType.QUICK: AsyncTaskManager.instance(name=TaskManagerType.QUICK.value, parallel_tasks=30)
         }
-
-        for task_manager in self.async_task_managers.values():
-            throttling_consumer = ThrottlingConsumer(manager=task_manager)
-            self.ioloop.add_callback(partial(cfg.add_rabbit_consumer, throttling_consumer))
-            self.ioloop.add_callback(throttling_consumer.consume)
 
         self.web_server = WebServer(self, cfg['service.api.v1.host'], cfg['service.api.v1.port'],
                                     path=cfg['service.api.path'])
@@ -190,10 +185,6 @@ class Aucote(object):
         """
         scan_task_manager = self.async_task_managers[TaskManagerType.SCANNER]
         try:
-            cfg.register_action(self.SCAN_CONTROL_START, self.start_scan)
-            cfg.register_action(self.SCAN_CONTROL_STOP, self.stop_scan)
-            cfg.register_action(self.SCAN_CONTROL_RESUME, self.resume_scan)
-            
             with self._storage_thread, self._tftp_thread:
                 scan_task_manager.clear()
                 self._storage.init_schema()
@@ -229,8 +220,8 @@ class Aucote(object):
 
             log.info("Closing loop")
 
-        except TopdisConnectionException:
-            log.exception("Exception while connecting to Topdis")
+        except FeederConnectionException:
+            log.exception("Exception while connecting to feeder")
 
     def _start_all_task_managers(self):
         for task_manager in self.async_task_managers.values():
@@ -251,9 +242,10 @@ class Aucote(object):
             None
 
         """
-        serializer = Serializer()
-        for exploit in self.exploits:
-            self.kudu_queue.send_msg(serializer.serialize_exploit(exploit))
+        # serializer = Serializer()
+        # for exploit in self.exploits:
+        #     self.kudu_queue.send_msg(serializer.serialize_exploit(exploit))
+        return
 
     def add_async_task(self, task, manager: TaskManagerType = TaskManagerType.REGULAR):
         """

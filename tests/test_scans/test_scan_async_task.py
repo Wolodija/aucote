@@ -36,7 +36,7 @@ class ScanAsyncTaskTest(AsyncTestCase):
                 },
                 'expiration_period': '365d'
             },
-            'topdis': {
+            'feeder': {
                 'api': {
                     'host': '',
                     'port': ''
@@ -81,9 +81,9 @@ class ScanAsyncTaskTest(AsyncTestCase):
         nodes = {node_1, node_2, node_3}
         future = Future()
         future.set_result(nodes)
-        self.aucote.topdis.get_all_nodes.return_value = future
-        self.aucote.topdis.get_snmp_nodes.return_value = Future()
-        self.aucote.topdis.get_snmp_nodes.return_value.set_result({node_4})
+        self.aucote.feeder.get_all_nodes.return_value = future
+        self.aucote.feeder.get_snmp_nodes.return_value = Future()
+        self.aucote.feeder.get_snmp_nodes.return_value.set_result({node_4})
 
         self.thread.storage.get_nodes = MagicMock(return_value=[node_2])
 
