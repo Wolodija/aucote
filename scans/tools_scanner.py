@@ -33,7 +33,7 @@ class ToolsScanner(ScanAsyncTask):
 
         To achieve resuming scans, the resume is introduced.
 
-        If resume is enabled, last scan is used to grab non scanned nodes, otherwise topdisco is used to refresh data
+        If resume is enabled, last scan is used to grab non scanned nodes, otherwise feederco is used to refresh data
 
         For non-resumed scan, ports should be taken from date of last non-resumed scan.
         For resumed scan, ports should taken from date of previous non-resumed scan (because we have to take same ports
@@ -89,13 +89,13 @@ class ToolsScanner(ScanAsyncTask):
             self.scan.end = time.time()
             self.storage.update_scan(self.scan)
         except (HTTPError, ConnectionError) as exception:
-            log.error('Cannot connect to topdis: %s, %s', self.topdis.api, exception)
+            log.error('Cannot connect to feeder: %s, %s', self.feeder.api, exception)
         finally:
             await self._clean_scan()
 
     def get_ports_for_scan(self, nodes, timestamp=None):
         """
-        Get ports for scanning. Topdis node data combined with stored open ports data.
+        Get ports for scanning. feeder node data combined with stored open ports data.
 
         Returns:
             list

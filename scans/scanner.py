@@ -14,7 +14,7 @@ import netifaces
 from tornado.httpclient import HTTPError
 
 from aucote_cfg import cfg
-from database.serializer import Serializer
+#from database.serializer import Serializer
 from scans.executor import Executor
 from scans.scan_async_task import ScanAsyncTask
 from structs import ScanStatus, PhysicalPort, Scan, TransportProtocol, PortDetectionChange, TaskManagerType
@@ -84,7 +84,7 @@ class Scanner(ScanAsyncTask):
             self.storage.update_scan(self.scan)
             self.diff_with_last_scan()
         except (HTTPError, ConnectionError) as exception:
-            log.error('Cannot connect to topdis: %s, %s', self.topdis.api, exception)
+            log.error('Cannot connect to feeder: %s, %s', self.feeder.api, exception)
         finally:
             await self._clean_scan()
 
@@ -217,5 +217,5 @@ class Scanner(ScanAsyncTask):
                                                previous_finding=port_scan) for port_scan in removed_ports_scans)
 
         self.storage.save_changes(changes)
-        for change in changes:
-            self.aucote.kudu_queue.send_msg(Serializer.serialize_vulnerability_change(change))
+        # for change in changes:
+        #     self.aucote.kudu_queue.send_msg(Serializer.serialize_vulnerability_change(change))
