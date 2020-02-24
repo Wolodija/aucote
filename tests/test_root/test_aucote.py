@@ -10,7 +10,7 @@ from tornado.testing import AsyncTestCase, gen_test
 from aucote import main, Aucote
 from structs import TaskManagerType
 from utils import Config
-from utils.exceptions import NmapUnsupported, TopdisConnectionException
+from utils.exceptions import NmapUnsupported, FeederConnectionException
 from utils.web_server import WebServer
 
 
@@ -61,7 +61,7 @@ class AucoteTest(AsyncTestCase):
                 }
             },
             'config_filename': 'test',
-            'topdis': {
+            'feeder': {
                 'api': {
                     'host': 'localhost',
                     'port': '1234',
@@ -286,7 +286,7 @@ class AucoteTest(AsyncTestCase):
 
     @patch('utils.kudu_queue.KuduQueue.__exit__', MagicMock(return_value=False))
     @patch('utils.kudu_queue.KuduQueue.__enter__', MagicMock(return_value=False))
-    @patch('aucote.TCPScanner.__init__', MagicMock(side_effect=TopdisConnectionException, return_value=None))
+    @patch('aucote.TCPScanner.__init__', MagicMock(side_effect=FeederConnectionException, return_value=None))
     @patch('aucote.Storage', MagicMock())
     @patch('scans.scanner.Executor')
     @patch('aucote.cfg', new_callable=Config)

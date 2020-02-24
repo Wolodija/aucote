@@ -6,10 +6,10 @@ from tornado.testing import AsyncTestCase, gen_test
 
 from structs import CPEType
 from utils import Config
-from utils.topdis import Topdis
+from utils.feeder import Feeder
 
 
-class TopdisTest(AsyncTestCase):
+class FeederTest(AsyncTestCase):
     TODIS_RESPONSE = b"""{
       "meta": {
         "apiVersion": "1.0.0",
@@ -193,8 +193,8 @@ class TopdisTest(AsyncTestCase):
     }"""
 
     def setUp(self):
-        super(TopdisTest, self).setUp()
-        self.topdis = Topdis('localhost', 1234, '/api/v1')
+        super(FeederTest, self).setUp()
+        self.feeder = Feeder('feeder', 1234, '/api/v1')
         self.req_future = Future()
         self.http_client_response = MagicMock()
         self.http_client_response.body = self.TODIS_RESPONSE
@@ -202,26 +202,26 @@ class TopdisTest(AsyncTestCase):
 
         }
 
-    @patch('utils.topdis.HTTPClient')
+    @patch('utils.feeder.HTTPClient')
     @gen_test
     async def test_getting_nodes_os_fingerprint(self, http_client):
         self.req_future.set_result(MagicMock(body=self.NODE_WITH_OS_FINGERPRINT))
         http_client.instance().get.return_value = self.req_future
 
-        nodes = await self.topdis.get_all_nodes()
+        nodes = await self.feeder.get_all_nodes()
         self.assertEqual(len(nodes), 1)
         result = list(nodes)[0]
 
         self.assertIsNone(result.os.name)
         self.assertIsNone(result.os.version)
 
-    @patch('utils.topdis.HTTPClient')
+    @patch('utils.feeder.HTTPClient')
     @gen_test
     async def test_getting_nodes(self, http_client):
         self.req_future.set_result(self.http_client_response)
         http_client.instance().get.return_value = self.req_future
 
-        nodes = await self.topdis.get_all_nodes()
+        nodes = await self.feeder.get_all_nodes()
 
         node = None
         for obj in nodes:
@@ -236,15 +236,15 @@ class TopdisTest(AsyncTestCase):
         self.assertEqual(node.ip.exploded, '10.3.3.99')
         self.assertEqual(node.name, 'EPSON1B0407')
 
-    @patch('utils.topdis.HTTPClient')
-    @patch('utils.topdis.Service.build_cpe')
+    @patch('utils.feeder.HTTPClient')
+    @patch('utils.feeder.Service.build_cpe')
     @gen_test
     async def test_getting_nodes_os_direct(self, mock_cpe, http_client):
         self.req_future.set_result(MagicMock(body=self.NODE_WITH_OS_DIRECT))
         http_client.instance().get.return_value = self.req_future
         mock_cpe.return_value = 'cpe:2.3:a:b:c:d:*:*:*:*:*:*:*'
 
-        nodes = await self.topdis.get_all_nodes()
+        nodes = await self.feeder.get_all_nodes()
         self.assertEqual(len(nodes), 1)
         result = list(nodes)[0]
 
@@ -253,15 +253,15 @@ class TopdisTest(AsyncTestCase):
         self.assertEqual(result.os.cpe, CPE(mock_cpe.return_value))
         mock_cpe.assert_called_once_with(product='test_name', version='11', part=CPEType.OS)
 
-    @patch('utils.topdis.HTTPClient')
-    @patch('utils.topdis.Service.build_cpe')
+    @patch('utils.feeder.HTTPClient')
+    @patch('utils.feeder.Service.build_cpe')
     @gen_test
     async def test_getting_nodes_os_direct_with_space_in_version(self, mock_cpe, http_client):
         self.req_future.set_result(MagicMock(body=self.NODE_WITH_OS_DIRECT_SPACES_VERSION))
         http_client.instance().get.return_value = self.req_future
         mock_cpe.side_effect = KeyError()
 
-        nodes = await self.topdis.get_all_nodes()
+        nodes = await self.feeder.get_all_nodes()
         self.assertEqual(len(nodes), 1)
         result = list(nodes)[0]
 
@@ -269,22 +269,22 @@ class TopdisTest(AsyncTestCase):
         self.assertEqual(result.os.version, '11 abcde')
         self.assertIsNone(result.os.cpe)
 
-    @patch('utils.topdis.HTTPClient')
+    @patch('utils.feeder.HTTPClient')
     @gen_test
     async def test_scan_time_init(self, http_client):
         self.req_future.set_result(self.http_client_response)
         http_client.instance().get.return_value = self.req_future
 
-        nodes = await self.topdis.get_all_nodes()
+        nodes = await self.feeder.get_all_nodes()
         expected = 1470915752.843
 
         node = list(nodes)[0]
 
         self.assertEqual(node.scan.start, expected)
 
-        @patch('utils.topdis.HTTPClient')
+        @patch('utils.feeder.HTTPClient')
         @gen_test
         async def test_getting_nodes_unknown_exception(self, http_client):
             http_client.instance().get.side_effect = Exception
             with self.assertRaises(Exception):
-                await self.topdis.get_nodes()
+                await self.feeder.get_nodes()
