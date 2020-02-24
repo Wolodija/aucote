@@ -7,7 +7,7 @@ import logging as log
 import time
 
 from aucote_cfg import cfg
-from database.serializer import Serializer
+#from database.serializer import Serializer
 from fixtures.exploits import Exploit
 from scans.task_mapper import TaskMapper
 from structs import BroadcastPort, TransportProtocol, Vulnerability, VulnerabilityChange
@@ -196,8 +196,8 @@ class NmapPortInfoTask(PortTask):
                                                previous_finding=vuln['prev']) for vuln in common_findings)
 
         self.storage.save_changes(changes)
-        for change in changes:
-            self.aucote.kudu_queue.send_msg(Serializer.serialize_vulnerability_change(change))
+        # for change in changes:
+        #     self.aucote.kudu_queue.send_msg(Serializer.serialize_vulnerability_change(change))
 
     def kill(self):
         if self.command:
