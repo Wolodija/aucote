@@ -4,8 +4,6 @@ This module provides default configuration and the global instance for the utils
 import os.path as path
 from sys import stderr
 
-import yaml
-
 import utils.log as log_cfg
 from utils import Config
 
@@ -45,9 +43,9 @@ _DEFAULT = {
             'filename': 'fixtures/exploits/exploits.csv'
         }
     },
-    'topdis': {
+    'feeder': {
         'api': {
-            'host': 'localhost',
+            'host': 'feeder',
             'port': 1234
         },
         'fetch_os': False
