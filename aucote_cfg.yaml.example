@@ -44,7 +44,8 @@ logging:
 #    max_nodes_query: <int> - Maximum number of nodes which should be quered for ports
 
 storage:
-    db: "dbname=aucote user=aucote password=aucote host=postgres port=5432"
+    #db: "dbname=aucote user=aucote password=aucote host=localhost port=5432"
+    db: "postgresql://aucote:aucote@postgres:5432/aucote"
     max_nodes_query: 200
     fresh_start: True
 
@@ -66,16 +67,16 @@ kuduworker:
     queue:
         address: ipc:///tmp/scar-pipeline.ipc
 
-# This section contains configuration related to topdis service
-# topdis:
+# This section contains configuration related to feeder service
+# feeder:
 #   api:
 #     host: <str|ipaddress> - host of api
 #     port: <int> - port of api
-#     base: <str> - base address for topdis
+#     base: <str> - base address for feeder
 
-topdis:
+feeder:
     api:
-        host: topdis
+        host: feeder
         port: 1234
         base: /api/v1
 
